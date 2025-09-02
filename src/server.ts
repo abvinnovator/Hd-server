@@ -58,6 +58,7 @@ app.use('/api/notes', notesRoutes);
 
 if (process.env.NODE_ENV === "production") {
   const __dirname1 = path.resolve();
+  // From compiled dist/server.js, go to src/dist
   const staticPath = path.join(__dirname1, "src/dist");
   
   console.log("🔍 Debug info:");
@@ -65,7 +66,6 @@ if (process.env.NODE_ENV === "production") {
   console.log("Static path:", staticPath);
   console.log("NODE_ENV:", process.env.NODE_ENV);
   
-  // Check if the path exists
   const fs = require('fs');
   console.log("Static path exists:", fs.existsSync(staticPath));
   console.log("index.html exists:", fs.existsSync(path.join(staticPath, "index.html")));
@@ -73,7 +73,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static(staticPath));
   
   app.get("*", (req, res) => {
-    const indexPath = path.resolve(__dirname1, "src/dist", "index.html");
+    const indexPath = path.join(staticPath, "index.html");
     console.log("Serving index.html from:", indexPath);
     res.sendFile(indexPath);
   });
