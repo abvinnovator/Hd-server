@@ -19,9 +19,12 @@ const PORT = config.port;
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: config.frontend.url,
+  origin: process.env.NODE_ENV === "production"
+    ? true 
+    : config.frontend.url, 
   credentials: true,
 }));
+
 
 // Rate limiting
 const limiter = rateLimit({
@@ -52,10 +55,10 @@ app.get('/health', (req, res) => {
 if (process.env.NODE_ENV === "production") {
   const __dirname1 = path.resolve();
 
-  app.use(express.static(path.join(__dirname1, "./dist")));
+  app.use(express.static(path.join(__dirname1, "/dist")));
 
   app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname1, "./dist", "index.html"));
+    res.sendFile(path.resolve(__dirname1, "/dist", "index.html"));
   });
 }
 app.use('/api/auth', authRoutes);
