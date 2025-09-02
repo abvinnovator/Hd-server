@@ -26,20 +26,43 @@ app.use(helmet({
         "'self'", 
         "'unsafe-inline'", 
         "https://accounts.google.com",
-        "https://apis.google.com"
+        "https://apis.google.com",
+        "https://*.googleusercontent.com"
       ],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://accounts.google.com"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://accounts.google.com"],
-      frameSrc: ["https://accounts.google.com"],
+      styleSrc: [
+        "'self'", 
+        "'unsafe-inline'", 
+        "https://accounts.google.com",
+        "https://fonts.googleapis.com"
+      ],
+      imgSrc: [
+        "'self'", 
+        "data:", 
+        "https:",
+        "https://*.googleusercontent.com",
+        "https://accounts.google.com"
+      ],
+      connectSrc: [
+        "'self'", 
+        "https://accounts.google.com",
+        "https://oauth2.googleapis.com"
+      ],
+      frameSrc: [
+        "https://accounts.google.com",
+        "https://content.googleapis.com"
+      ],
+      frameAncestors: ["'self'", "https://accounts.google.com"],
     },
   },
+  crossOriginEmbedderPolicy: false, // Important for Google Sign-In
 }));
 app.use(cors({
   origin: process.env.NODE_ENV === "production"
-    ? true 
-    : config.frontend.url, 
+    ? ['https://hd-server-77ro.onrender.com', 'https://accounts.google.com']
+    : [config.frontend.url, 'http://localhost:5173'], 
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 }));
 
 
