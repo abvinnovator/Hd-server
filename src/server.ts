@@ -17,7 +17,24 @@ const app = express();
 const PORT = config.port;
 
 // Security middleware
-app.use(helmet());
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'", 
+        "'unsafe-inline'", 
+        "https://accounts.google.com",
+        "https://apis.google.com"
+      ],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://accounts.google.com"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https://accounts.google.com"],
+      frameSrc: ["https://accounts.google.com"],
+    },
+  },
+}));
 app.use(cors({
   origin: process.env.NODE_ENV === "production"
     ? true 
