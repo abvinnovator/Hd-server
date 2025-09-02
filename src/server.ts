@@ -8,6 +8,7 @@ import { config } from './config/config';
 import { initDatabase } from './config/database';
 import authRoutes from './routes/authRoutes';
 import notesRoutes from './routes/noteRoutes'
+import path from "path";
 
 // Load environment variables
 dotenv.config();
@@ -48,8 +49,18 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
+if (process.env.NODE_ENV === "production") {
+  const __dirname1 = path.resolve();
+
+  app.use(express.static(path.join(__dirname1, "./dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname1, "./dist", "index.html"));
+  });
+}
 app.use('/api/auth', authRoutes);
 app.use('/api/notes', notesRoutes);
+
 
 // 404 handler
 app.use('*', (req, res) => {
