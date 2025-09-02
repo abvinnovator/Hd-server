@@ -52,26 +52,27 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
-if (process.env.NODE_ENV === "production") {
-  const __dirname1 = path.resolve();
 
-  app.use(express.static(path.join(__dirname1, "/dist")));
-
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname1, "/dist", "index.html"));
-  });
-}
 app.use('/api/auth', authRoutes);
 app.use('/api/notes', notesRoutes);
 
+if (process.env.NODE_ENV === "production") {
+  const __dirname1 = path.resolve();
+  app.use(express.static(path.join(__dirname1, "src/dist")));
+  
+  // Catch-all handler for SPA routing - THIS SHOULD BE LAST
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname1, "src/dist", "index.html"));
+  });
+}
 
 // 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found',
-  });
-});
+// app.use('*', (req, res) => {
+//   res.status(404).json({
+//     success: false,
+//     message: 'Route not found',
+//   });
+// });
 
 // Global error handler
 app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
