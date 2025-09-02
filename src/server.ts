@@ -27,34 +27,31 @@ app.use(helmet({
         "'unsafe-inline'", 
         "https://accounts.google.com",
         "https://apis.google.com",
-        "https://*.googleusercontent.com"
       ],
       styleSrc: [
         "'self'", 
         "'unsafe-inline'", 
         "https://accounts.google.com",
-        "https://fonts.googleapis.com"
       ],
       imgSrc: [
         "'self'", 
         "data:", 
         "https:",
-        "https://*.googleusercontent.com",
-        "https://accounts.google.com"
       ],
       connectSrc: [
         "'self'", 
         "https://accounts.google.com",
-        "https://oauth2.googleapis.com"
+        "https://oauth2.googleapis.com",
       ],
       frameSrc: [
+        "'self'",
         "https://accounts.google.com",
-        "https://content.googleapis.com"
       ],
-      frameAncestors: ["'self'", "https://accounts.google.com"],
+      frameAncestors: ["'none'"],
+      childSrc: ["'self'", "https://accounts.google.com"],
     },
   },
-  crossOriginEmbedderPolicy: false, // Important for Google Sign-In
+  crossOriginEmbedderPolicy: false,
 }));
 app.use(cors({
   origin: process.env.NODE_ENV === "production"

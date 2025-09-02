@@ -108,12 +108,6 @@ export class AuthController {
       }
 
       // Check if it's a Google user
-      if (user.is_google_user) {
-        return res.status(400).json({
-          success: false,
-          message: 'This account uses Google sign-in. Please use Google to login.',
-        });
-      }
 
       // Send login OTP
       await EmailService.sendLoginOTP(email);
