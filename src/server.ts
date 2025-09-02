@@ -58,11 +58,24 @@ app.use('/api/notes', notesRoutes);
 
 if (process.env.NODE_ENV === "production") {
   const __dirname1 = path.resolve();
-  app.use(express.static(path.join(__dirname1, "src/dist")));
+  const staticPath = path.join(__dirname1, "src/dist");
   
-  // Catch-all handler for SPA routing - THIS SHOULD BE LAST
+  console.log("🔍 Debug info:");
+  console.log("__dirname1:", __dirname1);
+  console.log("Static path:", staticPath);
+  console.log("NODE_ENV:", process.env.NODE_ENV);
+  
+  // Check if the path exists
+  const fs = require('fs');
+  console.log("Static path exists:", fs.existsSync(staticPath));
+  console.log("index.html exists:", fs.existsSync(path.join(staticPath, "index.html")));
+  
+  app.use(express.static(staticPath));
+  
   app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname1, "src/dist", "index.html"));
+    const indexPath = path.resolve(__dirname1, "src/dist", "index.html");
+    console.log("Serving index.html from:", indexPath);
+    res.sendFile(indexPath);
   });
 }
 
