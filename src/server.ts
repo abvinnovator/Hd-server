@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 
@@ -16,50 +15,7 @@ dotenv.config();
 const app = express();
 const PORT = config.port;
 
-// Security middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: [
-        "'self'", 
-        "'unsafe-inline'", 
-        "https://accounts.google.com",
-        "https://apis.google.com",
-        "https://www.gstatic.com", // Added for Google Sign-In
-      ],
-      styleSrc: [
-        "'self'", 
-        "'unsafe-inline'", 
-        "https://accounts.google.com",
-        "https://fonts.googleapis.com", // Added for Google fonts if needed
-      ],
-      imgSrc: [
-        "'self'", 
-        "data:", 
-        "https:",
-        "https://lh3.googleusercontent.com", // Added for Google profile images
-      ],
-      connectSrc: [
-        "'self'", 
-        "https://accounts.google.com",
-        "https://oauth2.googleapis.com",
-        "https://www.googleapis.com", // Added for Google API calls
-      ],
-      frameSrc: [
-        "'self'",
-        "https://accounts.google.com",
-      ],
-      frameAncestors: ["'none'"],
-      childSrc: ["'self'", "https://accounts.google.com"],
-      fontSrc: [
-        "'self'",
-        "https://fonts.gstatic.com", // Added for Google fonts if needed
-      ],
-    },
-  },
-  crossOriginEmbedderPolicy: false,
-}));
+
 
 // CORS configuration - UPDATED
 app.use(cors({
