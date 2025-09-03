@@ -17,7 +17,6 @@ const app = express();
 const PORT = config.port;
 
 // Security middleware
-
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -27,21 +26,25 @@ app.use(helmet({
         "'unsafe-inline'", 
         "https://accounts.google.com",
         "https://apis.google.com",
+        "https://www.gstatic.com", // Added for Google Sign-In
       ],
       styleSrc: [
         "'self'", 
         "'unsafe-inline'", 
         "https://accounts.google.com",
+        "https://fonts.googleapis.com", // Added for Google fonts if needed
       ],
       imgSrc: [
         "'self'", 
         "data:", 
         "https:",
+        "https://lh3.googleusercontent.com", // Added for Google profile images
       ],
       connectSrc: [
         "'self'", 
         "https://accounts.google.com",
         "https://oauth2.googleapis.com",
+        "https://www.googleapis.com", // Added for Google API calls
       ],
       frameSrc: [
         "'self'",
@@ -49,28 +52,67 @@ app.use(helmet({
       ],
       frameAncestors: ["'none'"],
       childSrc: ["'self'", "https://accounts.google.com"],
+      fontSrc: [
+        "'self'",
+        "https://fonts.gstatic.com", // Added for Google fonts if needed
+      ],
     },
   },
   crossOriginEmbedderPolicy: false,
 }));
+
+// CORS configuration - UPDATED
 app.use(cors({
-  origin: process.env.NODE_ENV === "production"
-    ? ['https://hd-server-77ro.onrender.com', 'https://accounts.google.com']
-    : [config.frontend.url, 'http://localhost:5173'], 
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = process.env.NODE_ENV === "production"
+      ? [
+          'https://hd-server-77ro.onrender.com',
+          'https://accounts.google.com',
+          'https://www.googleapis.com'
+        ]
+      : [
+          config.frontend.url,
+          'http://localhost:5173',
+          'http://localhost:3000',
+          'https://accounts.google.com',
+          'https://www.googleapis.com'
+        ];
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log('❌ CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization', 
+    'X-Requested-With',
+    'Accept',
+    'Origin'
+  ],
+  optionsSuccessStatus: 200, // For legacy browser support
 }));
 
+// Handle preflight requests explicitly
+app.options('*', cors());
 
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // limit each IP to 100 requests per windowMs
+  max: 1000, // limit each IP to 1000 requests per windowMs (increased for development)
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again later.',
   },
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
 app.use('/api/', limiter);
@@ -85,11 +127,11 @@ app.get('/health', (req, res) => {
     success: true,
     message: 'Server is running!',
     timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
   });
 });
 
 // API Routes
-
 app.use('/api/auth', authRoutes);
 app.use('/api/notes', notesRoutes);
 
@@ -141,11 +183,12 @@ const startServer = async () => {
     
     app.listen(PORT, () => {
       console.log(`
- Server is running!
- Port: ${PORT}
- Environment: ${process.env.NODE_ENV || 'development'}
- Health check: http://localhost:${PORT}/health
- Frontend URL: ${config.frontend.url}
+🚀 Server is running!
+📍 Port: ${PORT}
+🌍 Environment: ${process.env.NODE_ENV || 'development'}
+🏥 Health check: http://localhost:${PORT}/health
+🎨 Frontend URL: ${config.frontend.url}
+🔐 Google Client ID configured: ${!!process.env.GOOGLE_CLIENT_ID}
       `);
     });
   } catch (error) {
